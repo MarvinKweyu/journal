@@ -1,5 +1,7 @@
+django
 python-slugify
 drf-spectacular
+psycopg2-binary
 whitenoise
 django-environ
 django-allauth
@@ -7,3 +9,4 @@ django-cors-headers
 dj-rest-auth
 djangorestframework-simplejwt
 django-filter
+django-taggit

@@ -1,9 +1,12 @@
-from .base import *
-from .base import env
+from __future__ import absolute_import, unicode_literals
 
+import os
+from pathlib import Path
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-fae&@v(k28f_)lot$q)@nlvj1b40e21)7a1ze9vz3j=&yj$8k2"
+from journal.config.base import *
+
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "a^(6eqi@if&6lyt0h1od^o450!8h8@s0*x_rf9(bx(3fiuhj*6")
 
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
@@ -13,8 +16,14 @@ CORS_ALLOW_ALL_ORIGINS=True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DATABASE_NAME"),
+        "USER": os.environ.get("DATABASE_USER"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
+        "HOST": os.environ.get("DATABASE_HOST"),
+        "PORT": os.environ.get("DATABASE_PORT"),
     }
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

@@ -48,6 +48,7 @@ THIRD_PARTY = [
     "dj_rest_auth",
     "dj_rest_auth.registration",
     "django_filters",
+    "taggit"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY + LOCAL_APPS

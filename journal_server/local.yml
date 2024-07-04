@@ -10,6 +10,7 @@ services:
       - ./.env.dev
     networks:
       - proxynet
+    restart: "on-failure"
 
   db:
     image: postgres:12-bullseye
@@ -18,9 +19,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=journal_admin
-      - POSTGRES_PASSWORD=journal_admin
-      - POSTGRES_DB=journal_admin
+      - POSTGRES_USER=journal
+      - POSTGRES_PASSWORD=journal
+      - POSTGRES_DB=journal
     restart: "on-failure"
 
 networks:
