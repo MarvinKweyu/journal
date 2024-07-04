@@ -1,9 +1,0 @@
-python-slugify
-drf-spectacular
-whitenoise
-django-environ
-django-allauth
-django-cors-headers
-dj-rest-auth
-djangorestframework-simplejwt
-django-filter
