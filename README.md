@@ -3,8 +3,9 @@
 
 
 - [Journal](#journal)
-  - [Running locally](#running-locally)
+  - [Local development](#local-development)
 
 
-## Running locally
+## Local development
 
+Each project can be run individually by accessing the respective README files. Namely: `journal_client/README.md` and `journal_server/README.md`

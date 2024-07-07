@@ -25,6 +25,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     backgroundColor: '#f4e9e6',
+    // set maximum width
+    // maxWidth: 300,
 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
