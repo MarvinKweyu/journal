@@ -1,8 +1,12 @@
 // user model
 export type User = {
-    id: string;
-    title: string;
-    content: string;
-    category: string;
-    created: Date;
-};
+    access: string,
+    refresh: string,
+    user: {
+        pk: number,
+        username: string,
+        email: string,
+        first_name: string,
+        last_name: string
+    }
+}

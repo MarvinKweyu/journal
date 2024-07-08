@@ -2,19 +2,25 @@ import React, { useState } from 'react';
 import { Link, router } from 'expo-router';
 
 import { View, Switch, Alert, Text, SafeAreaView, TextInput, StyleSheet, Pressable } from 'react-native';
-
+import { useAuth } from './context/AuthContext';
 
 
 export default function SigninScreen() {
 
     const [click, setClick] = useState(false);
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { onLogin } = useAuth();
 
-    const handleSignin = () => {
-        // if successful , navigate to home
+    const handleSignin = async () => {
+
+        const res = await onLogin!(email, password);
+        if (res.error) {
+            console.log(res);
+            Alert.alert('Error', 'Invalid Credentials');
+            return;
+        }
         router.push('(tabs)/home');
-
     }
 
     return (
@@ -23,15 +29,15 @@ export default function SigninScreen() {
             <View style={styles.inputView}>
                 <TextInput
                     style={styles.input}
-                    placeholder='EMAIL OR USERNAME'
-                    value={username}
-                    onChangeText={setUsername}
+                    placeholder='Email'
+                    value={email}
+                    onChangeText={setEmail}
                     autoCorrect={false}
                     autoCapitalize='none' />
 
                 <TextInput
                     style={styles.input}
-                    placeholder='PASSWORD'
+                    placeholder='Password'
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
@@ -61,7 +67,9 @@ export default function SigninScreen() {
 
             </View>
 
-            <Text style={styles.footerText}>Don't Have Account?<Text style={styles.signup}>  Sign Up</Text></Text>
+            <Text style={styles.footerText}>Don't Have Account?
+                <Link href="/auth/signup" style={styles.signup}>  Sign Up</Link>
+            </Text>
 
 
         </SafeAreaView>

@@ -9,7 +9,8 @@ SECRET_KEY = os.environ.get(
     "SECRET_KEY", "a^(6eqi@if&6lyt0h1od^o450!8h8@s0*x_rf9(bx(3fiuhj*6")
 
 DEBUG = True
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+# ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]=}BszY@E9We_Wy@=}BszY@E9We_Wy@
+ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS=True
 
 # Database

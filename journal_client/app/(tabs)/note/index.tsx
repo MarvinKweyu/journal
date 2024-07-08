@@ -7,8 +7,7 @@ import { Note } from '@/components/Note';
 import { NewNote } from '@/components/NewNote';
 import { NoteModel } from '@/models/note';
 import { journalService } from '@/services/journalService';
-
-const API_URL = 'https://6676ab2b145714a1bd727114.mockapi.io/test-api/articles';
+import { Loading } from '@/components/Loading';
 
 export default function HomeScreen() {
 
@@ -20,7 +19,7 @@ export default function HomeScreen() {
   }, []);
 
   const fetchData = async () => {
-
+    setLoading(true);
     try {
       const notes = await journalService.getNotes();
       setNotes(notes);
@@ -35,6 +34,11 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <Categories />
       <Text style={styles.title}>Notes</Text>
+
+      {/*  show loading icon if true else list all notes */}
+      {loading && <Loading />}
+
+
       {notes.map((note, index) => (
         <Link href={{
           pathname: "note/[id]",
