@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, router } from 'expo-router';
 
-import { View, Switch, Alert, Text, SafeAreaView, TextInput, StyleSheet, Pressable } from 'react-native';
-import { useAuth } from './context/AuthContext';
+import { View, Alert, Text, SafeAreaView, TextInput, StyleSheet, Pressable } from 'react-native';
+import { useAuth } from '../context/AuthContext';
 
 
 export default function SigninScreen() {
 
-    const [click, setClick] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { onLogin } = useAuth();
@@ -16,11 +15,17 @@ export default function SigninScreen() {
 
         const res = await onLogin!(email, password);
         if (res.error) {
-            console.log(res);
-            Alert.alert('Error', 'Invalid Credentials');
+
+            // if res.msg is an array, show the first error
+            if (Array.isArray(res.msg)) {
+                Alert.alert(`Error ${res.msg[0]}`, 'Unable to login, please try again');
+                return;
+            }
+
+            Alert.alert(`Error ${res.msg}`, 'Unable to login, please try again');
             return;
         }
-        router.push('(tabs)/home');
+        router.push('(tabs)/note');
     }
 
     return (
@@ -45,14 +50,7 @@ export default function SigninScreen() {
                     autoCapitalize='none' />
             </View>
             <View style={styles.rememberView}>
-                <View style={styles.switch}>
-                    <Switch
-                        value={click}
-                        onValueChange={setClick}
-                        trackColor={{ true: "green", false: "gray" }} />
-                    <Text
-                        style={styles.rememberText}>Remember Me</Text>
-                </View>
+
                 <View>
                     <Pressable onPress={() => Alert.alert("Forget Password!")}>
                         <Text style={styles.forgetText}>Forgot Password?</Text>
@@ -64,7 +62,6 @@ export default function SigninScreen() {
                 <Pressable style={styles.button} onPress={() => handleSignin()}>
                     <Text style={styles.buttonText}>LOGIN</Text>
                 </Pressable>
-
             </View>
 
             <Text style={styles.footerText}>Don't Have Account?

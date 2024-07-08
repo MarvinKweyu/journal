@@ -5,49 +5,71 @@ import { Text, SafeAreaView } from 'react-native';
 import { Categories } from '@/components/Categories';
 import { Note } from '@/components/Note';
 import { NewNote } from '@/components/NewNote';
-import { NoteModel } from '@/models/note';
+import { NoteResultModel } from '@/models/note';
 import { journalService } from '@/services/journalService';
 import { Loading } from '@/components/Loading';
 
 export default function HomeScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [notes, setNotes] = useState<NoteModel[] | []>([]);
-  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetchData();
+    fetchNotes();
   }, []);
 
-  const fetchData = async () => {
+  const [notes, setNotes] = useState<NoteResultModel>({} as NoteResultModel);
+  const [loading, setLoading] = useState(true);
+
+  const fetchNotes = () => {
     setLoading(true);
-    try {
-      const notes = await journalService.getNotes();
-      setNotes(notes);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+
+    journalService.getNotes().then(res => {
+
+      setNotes(res);
+
+    }).catch(err => {
+      console.error('\n\n\nError fetching data:', err);
+    });
+    setLoading(false);
+  }
+
+  const filterCategory = (categoryId: number) => {
+    journalService.getNotesByCategory(categoryId).then(res => {
+      setNotes(res);
+
+    }).catch(err => {
+      console.error('\n\n\nError fetching data:', err);
+
+    });
+  }
+
+  const updateNotes = (res: any) => {
+    if (res) {
+      // prepend new note to notes
+      let newNotes = notes;
+      newNotes.results.unshift(res);
+      setNotes(newNotes);
     }
-  };
+    setModalVisible(false);
+  }
 
 
   return (
     <SafeAreaView style={styles.container}>
-      <Categories />
+      <Categories filterCategory={filterCategory} />
       <Text style={styles.title}>Notes</Text>
 
       {/*  show loading icon if true else list all notes */}
       {loading && <Loading />}
 
-
-      {notes.map((note, index) => (
+      {notes.results ? (notes.results.map((note, index) => (
         <Link href={{
           pathname: "note/[id]",
           params: { id: note.id }
-        }} key={index} >
+        }} key={note.id} >
           <Note note={note} />
         </Link>
 
-      ))}
+      ))) : (<Text>No notes found</Text>)}
 
 
       <TouchableOpacity
@@ -57,7 +79,7 @@ export default function HomeScreen() {
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
 
-      <NewNote isVisible={modalVisible} onClose={() => setModalVisible(false)} />
+      <NewNote isVisible={modalVisible} onClose={(value) => updateNotes(value)} />
 
     </SafeAreaView >
   );

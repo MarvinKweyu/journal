@@ -1,13 +1,12 @@
 from django.db import models
-from django.db.models.signals import post_save
 from django.utils.text import slugify
-
 
 class Category(models.Model):
     """
     Journal category
     """
     name = models.CharField(max_length=200)
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='category')
     slug = models.SlugField(unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, router } from 'expo-router';
 
 import { View, Text, SafeAreaView, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 
 export default function SignupScreen() {
@@ -18,7 +18,7 @@ export default function SignupScreen() {
         const password2 = password;
         const res = await onRegister!(email, username, password1, password2);
         if (res.error) {
-            Alert.alert(res.error);
+            Alert.alert(res.msg);
 
             return;
         }

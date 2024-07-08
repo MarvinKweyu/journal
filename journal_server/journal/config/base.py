@@ -36,6 +36,7 @@ DJANGO_APPS = [
 
 LOCAL_APPS = [
     "notes",
+    "accounts",
 ]
 
 THIRD_PARTY = [
@@ -185,6 +186,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
 }
+AUTH_USER_MODEL = "accounts.User"
 # APPEND_SLASH=False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True

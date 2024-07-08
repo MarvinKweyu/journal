@@ -1,18 +1,50 @@
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, TextInput, Button, TouchableOpacity } from 'react-native';
+import { CategoryResultModel } from '@/models/note';
+import { journalService } from '@/services/journalService';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Modal, TextInput, TouchableOpacity } from 'react-native';
 
-export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: () => void }) {
+import RNPickerSelect from 'react-native-picker-select';
 
+interface categorySelect {
+    label: string;
+    value: string;
+}
+
+export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (res: any) => void }) {
+    const [categories, setCategories] = useState<categorySelect[]>({} as categorySelect[]);
     const [newNote, setNewNote] = useState({ title: '', content: '', category: '' });
+    const [useDropdown, setUseDropdown] = useState(true); // State to toggle between dropdown and input
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = () => {
+        journalService.getCategories().then((res: CategoryResultModel) => {
+            let saved: categorySelect[] = [];
+            res.results.forEach(res => {
+                saved.push({ label: res.name, value: res.name });
+
+            });
+            setCategories(saved);
+        }).catch(err => {
+            console.error('\n\n\nError fetching data:', err);
+        });
+    }
 
     const handleCreateNote = () => {
-
-        console.log('New note:', newNote);
-        setNewNote({ title: '', content: '', category: '' });
-        onClose();
+        journalService.createNote(
+            newNote.title,
+            newNote.content,
+            newNote.category
+        ).then(res => {
+            setNewNote({ title: '', content: '', category: '' });
+            onClose(res);
+        }).catch(err => {
+            console.error('Error creating note:', err);
+        });
     };
-
 
     return (
         <Modal
@@ -37,12 +69,27 @@ export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (
                     multiline
                     numberOfLines={5}
                 />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Category"
-                    value={newNote.category}
-                    onChangeText={(text) => setNewNote({ ...newNote, category: text })}
-                />
+                {useDropdown ? (
+                    <RNPickerSelect
+                        placeholder={{ label: "Select a category", value: null }}
+                        style={pickerSelectStyles}
+                        onValueChange={(value) => setNewNote({ ...newNote, category: value })}
+                        items={categories}
+                    />
+                ) : (
+                    <TextInput
+                        style={styles.input}
+                        placeholder="New Category"
+                        value={newNote.category}
+                        onChangeText={(text) => setNewNote({ ...newNote, category: text })}
+                    />
+                )}
+
+                <TouchableOpacity onPress={() => setUseDropdown(!useDropdown)}>
+                    <Text >
+                        {useDropdown ? 'Create a new category' : 'Select an existing category'}
+                    </Text>
+                </TouchableOpacity>
                 <View style={styles.actions}>
                     <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                         <Text style={styles.buttonText}>Cancel</Text>
@@ -137,5 +184,28 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 16,
+    },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+    inputIOS: {
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        color: 'black',
+        borderRadius: 8,
+        borderColor: "#c99180",
+        paddingRight: 30,
+    },
+    inputAndroid: {
+        fontSize: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderWidth: 0.5,
+        borderColor: "#c99180",
+        borderRadius: 8,
+        color: 'black',
+        paddingRight: 30,
     },
 });

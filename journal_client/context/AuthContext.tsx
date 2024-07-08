@@ -20,10 +20,10 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }: any) => {
-    const [authState, setAuthState] = useState<{ access: string | null; refresh: string | null; authenticated: boolean | null, user: Object | null }>({
+    const [authState, setAuthState] = useState<{ access: string | null; refresh: string | null; authenticated: boolean, user: Object | null }>({
         access: null,
         refresh: null,
-        authenticated: null,
+        authenticated: true,
         user: null
     });
 
@@ -52,11 +52,16 @@ export const AuthProvider = ({ children }: any) => {
             await SecureStore.setItemAsync(REFRESH_KEY, JSON.stringify(response.data.refresh));
             await SecureStore.setItemAsync(CURRENT_USER_KEY, JSON.stringify(response.data.user)); // type user
             setAuthState({ access: response.data.access, refresh: response.data.refresh, authenticated: true, user: response.data.user });
+            axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
             return response;
         } catch (error) {
-            console.log("\n\n Server response")
-            console.log(error);
-            return { error: true, msg: (error as any).response }
+
+            const message = (error as any).response.data
+            
+            const keys = Object.keys(message);
+            const prop = keys[Math.floor(Math.random() * keys.length)]
+            
+            return { error: true, msg: message[prop] }
         }
     }
 
@@ -71,10 +76,11 @@ export const AuthProvider = ({ children }: any) => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.access}`;
             return res.data;
         } catch (error) {
-
-            console.log("\n\n")
-            console.log((error as any).response.data)
-            return { error: true, msg: (error as any).response.data }
+            const message = (error as any).response.data
+            const keys = Object.keys(message);
+            const prop = keys[Math.floor(Math.random() * keys.length)]
+            
+            return { error: true, msg: message[prop] }
         }
     }
 
