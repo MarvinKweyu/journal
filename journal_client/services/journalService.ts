@@ -3,10 +3,19 @@ import axios from 'axios';
 export const BASE_URL = 'http://10.0.2.2:8000/api/notes/'
 const CATEGORY_URL = 'http://10.0.2.2:8000/api/categories/'
 
-const getNotes = async () => {
+const getNotes = async (page: string | null) => {
   try {
-    const response = await axios.get(BASE_URL);
-    return response.data;
+    if (!page) {
+      const response = await axios.get(BASE_URL);
+      return response.data;
+      
+    } else {
+      // "http://api.example.org/accounts/?cursor=cj0xJnA9NDg3"
+      // grab the cursor from the url
+      const cursor = page.split('=')[1];
+      const response = await axios.get(`${BASE_URL}?cursor=${cursor}`);
+      return response.data;
+    }
   } catch (error) {
     const message = (error as any).response.data
 
@@ -27,6 +36,9 @@ const getNoteById = async (id: number) => {
 }
 
 const getNotesByCategory = async (categoryId: number) => {
+  if (categoryId == 0) { // we are getting everything
+    return getNotes(null);
+  }
   try {
     const response = await axios.get(`${BASE_URL}?category=${categoryId}`);
     return response.data;

@@ -14,6 +14,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
+    class Meta:
+        unique_together = ('name', 'user')
+        verbose_name_plural = "Categories"
+    
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Category, self).save(*args, **kwargs)
@@ -36,5 +40,5 @@ class Note(models.Model):
         return self.title
     
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.title + str(self.created))
         super(Note, self).save(*args, **kwargs)

@@ -1,4 +1,4 @@
-
+import { errorText } from '@/constants/Errors';
 import { CategoryResultModel } from '@/models/note';
 import { journalService } from '@/services/journalService';
 import React, { useState, useEffect } from 'react';
@@ -11,10 +11,18 @@ interface categorySelect {
     value: string;
 }
 
+interface errorGroup {
+    title: string | null;
+    category: string | null;
+    content: string | null;
+
+}
+
 export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (res: any) => void }) {
-    const [categories, setCategories] = useState<categorySelect[]>({} as categorySelect[]);
+    const [categories, setCategories] = useState<categorySelect[]>([] as categorySelect[]);
     const [newNote, setNewNote] = useState({ title: '', content: '', category: '' });
-    const [useDropdown, setUseDropdown] = useState(true); // State to toggle between dropdown and input
+    const [useDropdown, setUseDropdown] = useState(true);
+    const [errors, setError] = useState({} as errorGroup);
 
     useEffect(() => {
         fetchCategories();
@@ -33,17 +41,33 @@ export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (
         });
     }
 
+    const validateForm = () => {
+        let error: errorGroup = {} as errorGroup;
+
+        if (!newNote.title) error.title = 'Please provide a title';
+        if (!newNote.category) error.category = 'Please give it a category';
+        if (!newNote.content) error.content = 'Please fill in the content';
+
+        setError(error);
+
+        return Object.values(error).every(value => value === null);
+
+    };
+
     const handleCreateNote = () => {
-        journalService.createNote(
-            newNote.title,
-            newNote.content,
-            newNote.category
-        ).then(res => {
-            setNewNote({ title: '', content: '', category: '' });
-            onClose(res);
-        }).catch(err => {
-            console.error('Error creating note:', err);
-        });
+        if (validateForm()) {
+            journalService.createNote(
+                newNote.title,
+                newNote.content,
+                newNote.category
+            ).then(res => {
+                setNewNote({ title: '', content: '', category: '' });
+                setError({} as errorGroup);
+                onClose(res);
+            }).catch(err => {
+                console.error('Error creating note:', err);
+            });
+        }
     };
 
     return (
@@ -61,6 +85,7 @@ export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (
                     value={newNote.title}
                     onChangeText={(text) => setNewNote({ ...newNote, title: text })}
                 />
+                {errors.title && <Text style={errorText.style}>{errors.title}</Text>}
                 <TextInput
                     style={styles.input}
                     placeholder="Today ..."
@@ -69,6 +94,7 @@ export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (
                     multiline
                     numberOfLines={5}
                 />
+                {errors.content && <Text style={errorText.style}>{errors.content}</Text>}
                 {useDropdown ? (
                     <RNPickerSelect
                         placeholder={{ label: "Select a category", value: null }}
@@ -84,12 +110,19 @@ export function NewNote({ isVisible, onClose }: { isVisible: boolean, onClose: (
                         onChangeText={(text) => setNewNote({ ...newNote, category: text })}
                     />
                 )}
-
+                {errors.category && <Text style={errorText.style}>{errors.category}</Text>}
+                {/* {categories.length !== 0 &&
+                    <> */}
                 <TouchableOpacity onPress={() => setUseDropdown(!useDropdown)}>
                     <Text >
                         {useDropdown ? 'Create a new category' : 'Select an existing category'}
                     </Text>
                 </TouchableOpacity>
+                {/* </> */}
+
+                {/* } */}
+
+
                 <View style={styles.actions}>
                     <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
                         <Text style={styles.buttonText}>Cancel</Text>

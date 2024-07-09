@@ -7,7 +7,6 @@ export type NoteModel = {
 };
 
 export type NoteResultModel = {
-    count: number;
     next: string;
     previous: string;
     results: NoteModel[];
@@ -23,7 +22,6 @@ export type CategoryModel = {
 };
 
 export type CategoryResultModel = {
-    count: number;
     next: string;
     previous: string;
     results: CategoryModel[];

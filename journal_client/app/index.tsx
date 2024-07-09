@@ -4,28 +4,55 @@ import { Link, router } from 'expo-router';
 import { View, Alert, Text, SafeAreaView, TextInput, StyleSheet, Pressable } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
+import { errorText } from '@/constants/Errors';
+
+export interface errorGroup {
+    email: string | null;
+    password: string | null;
+
+}
+
 
 export default function SigninScreen() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errors, setError] = useState({} as errorGroup);
     const { onLogin } = useAuth();
 
+    const validateForm = () => {
+        let error: errorGroup = {} as errorGroup
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) error.email = 'Your email is invalid';
+
+        if (!email) error.email = 'Your email is required';
+
+        if (!password) error.password = 'Your password is required';
+
+        setError(error);
+
+        return Object.values(error).every(value => value === null);
+
+    };
+
     const handleSignin = async () => {
-
-        const res = await onLogin!(email, password);
-        if (res.error) {
-
-            // if res.msg is an array, show the first error
-            if (Array.isArray(res.msg)) {
-                Alert.alert(`Error ${res.msg[0]}`, 'Unable to login, please try again');
+        if (validateForm()) {
+            const res = await onLogin!(email, password);
+            if (res.error) {
+                // if res.msg is an array, show the first error
+                if (Array.isArray(res.msg)) {
+                    Alert.alert(`Error ${res.msg[0]}`, 'Unable to login, please try again');
+                    return;
+                }
+                Alert.alert(`Error ${res.msg}`, 'Unable to login, please try again');
                 return;
             }
-
-            Alert.alert(`Error ${res.msg}`, 'Unable to login, please try again');
-            return;
+            setEmail('');
+            setPassword('');
+            setError({} as errorGroup);
+            router.push('(tabs)/note');
         }
-        router.push('(tabs)/note');
+
     }
 
     return (
@@ -39,6 +66,7 @@ export default function SigninScreen() {
                     onChangeText={setEmail}
                     autoCorrect={false}
                     autoCapitalize='none' />
+                {errors.email && <Text style={errorText.style}>{errors.email}</Text>}
 
                 <TextInput
                     style={styles.input}
@@ -48,6 +76,7 @@ export default function SigninScreen() {
                     onChangeText={setPassword}
                     autoCorrect={false}
                     autoCapitalize='none' />
+                {errors.password! == null && <Text style={errorText.style}>{errors.password}</Text>}
             </View>
             <View style={styles.rememberView}>
 

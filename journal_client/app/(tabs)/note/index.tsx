@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
-import { Text, SafeAreaView } from 'react-native';
+import { Link, router } from 'expo-router';
+import { Text, SafeAreaView, FlatList, View } from 'react-native';
 import { Categories } from '@/components/Categories';
 import { Note } from '@/components/Note';
 import { NewNote } from '@/components/NewNote';
@@ -13,16 +13,16 @@ export default function HomeScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
   useEffect(() => {
-    fetchNotes();
+    fetchNotes(null);
   }, []);
 
   const [notes, setNotes] = useState<NoteResultModel>({} as NoteResultModel);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotes = () => {
+  const fetchNotes = (page: string | null) => {
     setLoading(true);
 
-    journalService.getNotes().then(res => {
+    journalService.getNotes(page).then(res => {
 
       setNotes(res);
 
@@ -43,34 +43,54 @@ export default function HomeScreen() {
   }
 
   const updateNotes = (res: any) => {
-    if (res) {
-      // prepend new note to notes
-      let newNotes = notes;
-      newNotes.results.unshift(res);
-      setNotes(newNotes);
-    }
+    fetchNotes(null);
+    // if (res) {
+    //   // prepend new note to notes
+    //   let newNotes = notes;
+    //   newNotes.results.unshift(res);
+    //   setNotes(newNotes);
+    // }
     setModalVisible(false);
   }
 
 
   return (
     <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>My Journal</Text>
       <Categories filterCategory={filterCategory} />
-      <Text style={styles.title}>Notes</Text>
-
-      {/*  show loading icon if true else list all notes */}
       {loading && <Loading />}
 
-      {notes.results ? (notes.results.map((note, index) => (
-        <Link href={{
-          pathname: "note/[id]",
-          params: { id: note.id }
-        }} key={note.id} >
-          <Note note={note} />
-        </Link>
+      {notes.results ?
+        (<FlatList
+          style={{ marginTop: 15 }}
+          showsVerticalScrollIndicator={false}
+          data={notes.results}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() =>
+                router.push({ pathname: "note/[id]", params: { id: item.id } })
 
-      ))) : (<Text>No notes found</Text>)}
+              }
+            >
+              <Note note={item} />
+            </TouchableOpacity>
+          )}
+        />) : (<Text>No notes found</Text>)}
 
+
+      <View style={styles.pagination}>
+        {notes.previous &&
+          <TouchableOpacity  style={styles.prev}  onPress={() => { fetchNotes(notes.previous) }}>
+            <Text>Previous</Text>
+          </TouchableOpacity>
+        }
+        {notes.next &&
+          <TouchableOpacity onPress={() => { fetchNotes(notes.next) }}>
+            <Text>Next</Text>
+          </TouchableOpacity>
+        }
+      </View>
 
       <TouchableOpacity
         style={styles.fab}
@@ -96,6 +116,7 @@ const styles = StyleSheet.create({
     gap: 8,
     fontWeight: 'bold',
     fontSize: 24,
+    marginTop: 20,
   },
   stepContainer: {
     gap: 8,
@@ -119,4 +140,13 @@ const styles = StyleSheet.create({
     fontSize: 34,
     color: 'white',
   },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+
+  prev: {
+    marginRight: 10,
+  }
 });

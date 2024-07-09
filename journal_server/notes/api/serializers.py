@@ -31,9 +31,8 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['slug']
 
-    #  get the user from the request and set it as the user for the category during create
     def create(self, validated_data):
         user = self.context['request'].user
-        category = Category.objects.create(user=user, **validated_data)
+        category, created = Category.objects.get_or_create(user=user, **validated_data)
         return category
         

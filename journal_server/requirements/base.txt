@@ -5,6 +5,7 @@ psycopg2-binary
 whitenoise
 django-environ
 django-allauth
+argon2-cffi
 django-cors-headers
 dj-rest-auth
 djangorestframework-simplejwt

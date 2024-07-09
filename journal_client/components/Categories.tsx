@@ -17,7 +17,11 @@ export function Categories({ filterCategory }: CategoriesProps) {
 
     const fetchCategories = () => {
         journalService.getCategories().then(res => {
+            // prepend all to results
+            const all = { id: 0, name: 'All' };
+            res.results.unshift(all);
             setCategories(res);
+
         }).catch(err => {
             console.error('\n\n\nError fetching data:', err);
         });

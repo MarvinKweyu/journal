@@ -3,33 +3,71 @@ import { Link, router } from 'expo-router';
 
 import { View, Text, SafeAreaView, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { errorText } from '@/constants/Errors';
 
+export interface errorGroup {
+    email: string | null;
+    username: string | null;
+    password: string | null;
+
+}
 
 export default function SignupScreen() {
 
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errors, setError] = useState({} as errorGroup);
+
+    const validateForm = () => {
+        let error: errorGroup = {} as errorGroup;
+
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) error.email = 'Your email is invalid';
+        
+        if (password.length < 8) error.password = 'Password must be at least 8 characters long';
+
+        if (username.length < 4 || username.length > 10) error.username = 'Username must be between 4 and 10 characters long';
+
+
+        if (!email) error.email = 'Your email is required';
+        if (!username) error.username = 'A username is required';
+        if (!password) error.password = 'Your password is required';
+
+        setError(error);
+
+        return Object.values(error).every(value => value === null);
+
+    };
+
 
     const { onRegister } = useAuth();
 
     const handleSignUp = async () => {
-        const password1 = password;
-        const password2 = password;
-        const res = await onRegister!(email, username, password1, password2);
-        if (res.error) {
-            Alert.alert(res.msg);
+        if (validateForm()) {
+            const password1 = password;
+            const password2 = password;
+            const res = await onRegister!(email, username, password1, password2);
+            if (res.error) {
+                Alert.alert(res.msg);
 
-            return;
+                return;
+            }
+            setEmail('');
+            setUsername('');
+            setPassword('');
+            setError({} as errorGroup);
+            router.push('(tabs)/note');
+
         }
-        router.push('(tabs)/note');
-
     }
 
     return (
 
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>SignUp</Text>
+
             <View style={styles.inputView}>
                 <TextInput
                     style={styles.input}
@@ -38,6 +76,7 @@ export default function SignupScreen() {
                     onChangeText={setEmail}
                     autoCorrect={false}
                     autoCapitalize='none' />
+                {errors.email && <Text style={errorText.style}>{errors.email}</Text>}
                 <TextInput
                     style={styles.input}
                     placeholder='Username'
@@ -45,6 +84,7 @@ export default function SignupScreen() {
                     onChangeText={setUsername}
                     autoCorrect={false}
                     autoCapitalize='none' />
+                {errors.username && <Text style={errorText.style}>{errors.username}</Text>}
 
                 <TextInput
                     style={styles.input}
@@ -54,6 +94,7 @@ export default function SignupScreen() {
                     onChangeText={setPassword}
                     autoCorrect={false}
                     autoCapitalize='none' />
+                {errors.password && <Text style={errorText.style}>{errors.password}</Text>}
             </View>
 
             <View style={styles.buttonView}>
@@ -64,7 +105,7 @@ export default function SignupScreen() {
             </View>
 
             <Text style={styles.footerText}>Already have an account?
-                <Link href="/index" style={styles.signup}> Sign in</Link>
+                <Link href="/" style={styles.signup}> Sign in</Link>
             </Text>
 
         </SafeAreaView>
@@ -130,7 +171,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 8,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        marginTop: 10,
     },
     buttonText: {
         color: "white",
@@ -166,5 +208,10 @@ const styles = StyleSheet.create({
     signup: {
         color: "#c99180",
         fontSize: 13
+    },
+    errorText: {
+        color: "red",
+        textAlign: "center",
+        marginTop: -10
     }
 });

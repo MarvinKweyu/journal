@@ -27,20 +27,20 @@ export default function RootLayout() {
     return null;
   }
 
-  const { authState } = useAuth();
+  const { authState, getUser } = useAuth();
 
   return (
     <AuthProvider>
       {/* <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}> */}
-      <Stack>
-        {authState?.authenticated ? (
+      <Stack screenOptions={{ headerShown: false }}>
+        {getUser ? (
           <>
-            <Stack.Screen name="(tabs)/note" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)/note" />
             <Stack.Screen name="+not-found" /></>) : (
           <>
 
-            <Stack.Screen name="/index" options={{ headerShown: false }} />
-            <Stack.Screen name="/auth/signup" options={{ headerShown: false }} />
+            <Stack.Screen name="/index" />
+            <Stack.Screen name="/auth/signup" />
           </>
         )}
 
