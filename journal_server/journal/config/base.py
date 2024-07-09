@@ -176,7 +176,7 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "journal API",
     "DESCRIPTION": "Documentation of API endpoints of the journal API",
     "VERSION": "1.0.0",
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"], 
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAuthenticated"], 
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
