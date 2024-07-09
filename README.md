@@ -19,5 +19,5 @@ Each project can be run individually by accessing the respective README files. N
 ## Project Path
 The following outlines the suggested project path.
 - [ ] Toggle between dark and light modes
-- [ ] Enable profile creation that will include an image and bio
+- [ ] Add profile picture to a user's account
 - [ ] Add the ability to contact the developers for more information / help

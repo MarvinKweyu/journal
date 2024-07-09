@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Image,
+  Alert,
   TextInput,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
@@ -16,17 +17,23 @@ import { router } from 'expo-router';
 import { User } from '@/models/user';
 import { errorText } from '@/constants/Errors';
 import { PasswordReset } from '@/components/PasswordReset';
+import { journalService } from '@/services/journalService';
 
 export interface errorGroup {
   username: string | null;
-  password: string | null;
+}
 
+export interface summaryInterface {
+  today: number;
+  past_week: number,
+  past_month: number
 }
 
 export default function Profile() {
 
   const { getUser, updateUsername, onLogout } = useAuth();
   const [user, setUser] = useState<User | null>({} as User);
+  const [summary, setSummary] = useState<summaryInterface>({} as summaryInterface);
   const [updateName, setUpdateUsername] = useState<boolean>(false);
   const [passwordModalVisible, setPasswordModalVisible] = useState<boolean>(false);
   const [errors, setError] = useState({} as errorGroup);
@@ -35,6 +42,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchData();
+    fetchSummary();
   }, []);
 
   const fetchData = () => {
@@ -45,15 +53,36 @@ export default function Profile() {
     });
   };
 
+  const validateForm = () => {
+    let error: errorGroup = {} as errorGroup;
+    if (username.length < 4 || username.length > 10) error.username = 'Please use a length between 4 to 10 characters';
+    if (!username) error.username = 'Please provide a username';
+
+    setError(error);
+    return Object.values(error).every(value => value === null);
+
+  };
+
+  const fetchSummary = () => {
+    journalService.getSummary().then(res => {
+
+      setSummary(res);
+    }).catch(err => {
+      console.error(err);
+    });
+  }
+
   const changeUsername = async () => {
-    const res = await updateUsername!('newUsername');
-    if (res.error) {
-      console.log('Unable to update the suername')
-      // setError({ username: res.msg });
-      return;
+    if (validateForm()) {
+      const res = await updateUsername!('newUsername');
+      if (res.error) {
+
+        Alert.alert('Something happened!', 'Unable to update the username at this time');
+        return;
+      }
+      setUser(res);
     }
-    console.log('Username updated');
-    setUser(res);
+
   };
 
   return (
@@ -96,6 +125,42 @@ export default function Profile() {
 
         <ScrollView>
           <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Summary</Text>
+            <View style={styles.row} >
+              <Text style={styles.rowLabel}>Today</Text>
+              <View style={styles.rowSpacer} />
+              <Text>{summary.today}</Text>
+            </View>
+            <View style={styles.row} >
+              <Text style={styles.rowLabel}>Past week</Text>
+              <View style={styles.rowSpacer} />
+              <Text>{summary.past_week}</Text>
+            </View>
+            <View style={styles.row} >
+              <Text style={styles.rowLabel}>This month</Text>
+              <View style={styles.rowSpacer} />
+              <Text>{summary.past_month}</Text>
+            </View>
+
+            {/* based on the kind of summary we need */}
+
+            {/* <TouchableOpacity
+              onPress={() => {
+                router.push('(tabs)/profile/summary');
+              }}
+              style={styles.row}>
+
+              <Text style={styles.rowLabel}>Your activity</Text>
+              <View style={styles.rowSpacer} />
+
+              <Feather
+                color="#C6C6C6"
+                name="activity"
+                size={20} />
+            </TouchableOpacity> */}
+
+          </View>
+          <View style={styles.section}>
             <Text style={styles.sectionTitle}>Preferences</Text>
 
             <TouchableOpacity
@@ -116,6 +181,7 @@ export default function Profile() {
             </TouchableOpacity>
 
           </View>
+
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Resources</Text>
@@ -260,6 +326,17 @@ const styles = StyleSheet.create({
     color: '#989898',
     textAlign: 'center',
   },
+
+  //*** summary*/
+  summary: {
+    padding: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#f2f2f2',
+
+  },
   /** Section */
   section: {
     paddingHorizontal: 24,
@@ -317,6 +394,18 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  input: {
+    height: 40,
+    margin: 12,
+    width: '100%',
+    borderBottomWidth: 1,
+    marginBottom: 10,
+    padding: 8,
+    fontSize: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#c99180",
+  },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -342,11 +431,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  input: {
-    height: 50,
-    paddingHorizontal: 20,
-    borderColor: "#c99180",
-    borderWidth: 1,
-    borderRadius: 7
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 18,
   },
+
 });

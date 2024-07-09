@@ -3,11 +3,12 @@ from notes.models import Note, Category
 
 class NoteSerializer(serializers.ModelSerializer):
 
-    category_name = serializers.CharField(write_only=True)
+    category_name = serializers.CharField(write_only=True) 
     class Meta:
         model = Note
         fields = '__all__'
         read_only_fields = ['slug']
+        depth = 1 
 
     def create(self, validated_data):
         category_name = validated_data.pop('category_name', None)
@@ -23,7 +24,7 @@ class NoteSerializer(serializers.ModelSerializer):
     
     def get_category_name(self, obj):
         return obj.category.name
-
+    
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

@@ -105,6 +105,17 @@ const updateNote = async (id: string, title: string, content: string, category: 
   }
 }
 
+const getSummary = async () => { 
+  try {
+    const response = await axios.get(`${BASE_URL}overview/`);
+    return response.data;
+  } catch (error) {
+    const message = (error as any).response.data
+    return { error: true, msg: message }
+  }
+
+}
+
 export const journalService = {
   createNote,
   getNotes,
@@ -113,4 +124,5 @@ export const journalService = {
   deleteNote,
   getNotesByCategory,
   getCategories,
+  getSummary,
 };

@@ -3,15 +3,18 @@ import { View, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react
 import { Link, router, useLocalSearchParams } from 'expo-router';
 import { Text, SafeAreaView, Modal } from 'react-native';
 import { formatDate } from '@/utils/dateFormatter';
-import { NoteModel } from '@/models/note';
+import { NewNoteModel, NoteModel } from '@/models/note';
 import { Loading } from '@/components/Loading';
 import { journalService } from '@/services/journalService';
 import { AntDesign } from '@expo/vector-icons';
+import { EditNote } from '@/components/EditNote';
 
 
 export default function NoteInfo() {
     const [note, setNote] = useState<NoteModel | null>(null);
+    
     const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
+    const [visibleEditModal, setEditVisible] = useState(false);
     const [loadingError, setLoadingError] = useState<Object | null>(null);
 
     // const { id } = route.params;
@@ -36,13 +39,21 @@ export default function NoteInfo() {
             router.push('(tabs)/note');
         }).catch(err => { setLoadingError(err); });;
     };
+
+    const updateNote = () => {
+        
+        fetchNote();
+        setEditVisible(false);
+    }
+
+
     return (
         <SafeAreaView style={styles.container}>
 
             {note ? (
                 <>
                     <View style={styles.actions}>
-                        <Pressable style={styles.action} onPress={() => deleteNote()}>
+                        <Pressable style={styles.action} onPress={() => setEditVisible(true)}>
                             <AntDesign name="edit" size={24} color="black" />
                         </Pressable>
                         <Pressable style={styles.action} onPress={() => setConfirmDelete(true)}>
@@ -51,7 +62,8 @@ export default function NoteInfo() {
 
                     </View>
                     <Text style={styles.title}>{note.title}</Text>
-                    <Text style={styles.tag}>{note.category}</Text>
+
+                    <Text style={styles.tag}>{note.category.name}</Text>
                     <Text style={styles.date}>{formatDate(note.created)}</Text>
                     <ScrollView showsVerticalScrollIndicator={false}>
                         <Text style={styles.content}>{note.content}</Text>
@@ -82,6 +94,8 @@ export default function NoteInfo() {
                 </View>
 
             </Modal>
+            {note && <EditNote isVisible={visibleEditModal} prevNote={note} onClose={(value) => { updateNote() }} />}
+
 
         </SafeAreaView>
     );
@@ -89,8 +103,10 @@ export default function NoteInfo() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
-        margin: 20
+
+        margin: 20,
+        flex: 1,
+        padding: 16,
     },
     back: {
         paddingHorizontal: 0,
@@ -99,10 +115,11 @@ const styles = StyleSheet.create({
     },
     actions: {
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        width: '100%',
     },
     action: {
-        paddingHorizontal: 2,
+        paddingHorizontal: 10,
     },
     title: {
         flexDirection: 'row',

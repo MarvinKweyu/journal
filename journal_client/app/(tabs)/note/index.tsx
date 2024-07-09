@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import { Link, router } from 'expo-router';
 import { Text, SafeAreaView, FlatList, View } from 'react-native';
 import { Categories } from '@/components/Categories';
@@ -27,7 +27,7 @@ export default function HomeScreen() {
       setNotes(res);
 
     }).catch(err => {
-      console.error('\n\n\nError fetching data:', err);
+      Alert.alert('Oops', 'Something went wrong. Please try again later.');
     });
     setLoading(false);
   }
@@ -37,7 +37,7 @@ export default function HomeScreen() {
       setNotes(res);
 
     }).catch(err => {
-      console.error('\n\n\nError fetching data:', err);
+      Alert.alert('Oops', 'Something went wrong. Please try again later.');
 
     });
   }
@@ -60,7 +60,7 @@ export default function HomeScreen() {
       <Categories filterCategory={filterCategory} />
       {loading && <Loading />}
 
-      {notes.results ?
+      {notes.results?.length > 0 ?
         (<FlatList
           style={{ marginTop: 15 }}
           showsVerticalScrollIndicator={false}
@@ -76,12 +76,12 @@ export default function HomeScreen() {
               <Note note={item} />
             </TouchableOpacity>
           )}
-        />) : (<Text>No notes found</Text>)}
+        />) : (<Text style={styles.noNotes}>Create a note to get started!</Text>)}
 
 
       <View style={styles.pagination}>
         {notes.previous &&
-          <TouchableOpacity  style={styles.prev}  onPress={() => { fetchNotes(notes.previous) }}>
+          <TouchableOpacity style={styles.prev} onPress={() => { fetchNotes(notes.previous) }}>
             <Text>Previous</Text>
           </TouchableOpacity>
         }
@@ -148,5 +148,11 @@ const styles = StyleSheet.create({
 
   prev: {
     marginRight: 10,
+  },
+
+  noNotes: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
   }
 });

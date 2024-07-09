@@ -26,6 +26,7 @@ You can now create a python virtual environment, install the dependencies and ru
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements/local.txt
+python manage.py migrate
 python3 manage.py runserver
 ```
 
@@ -36,7 +37,13 @@ Copy the `.env.example` file onto `.env.dev`
 With docker and docker-compose installed, run the following commands to build and run the application.
 
 ```bash
-docker-compose -f local.yml up -d --build
+docker-compose -f local.yml up
+```
+
+You can create an admin user once the app is running with:
+
+```bash
+docker-compose exec web python manage.py createsuperuser
 ```
 
 ### Accesing the project locally

@@ -121,6 +121,7 @@ export const AuthProvider = ({ children }: any) => {
     const changePassword = async (new_password: string, confirm_password: string) => {
         try {
             const res = await axios.patch(`${BASE_URL}password/change/`, { new_password1: new_password, new_password2: confirm_password });
+            return res.data;
         } catch (error) {
             const message = (error as any).response.data
             return { error: true, msg: message }

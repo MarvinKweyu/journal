@@ -33,8 +33,7 @@ export function PasswordReset({ isVisible, onClose }: { isVisible: boolean, onCl
             const res = await changePassword!(new_password, confirm_password);
 
             if (res.error) {
-                Alert.alert(res.msg);
-
+                Alert.alert('Please try again later', res.msg);
                 return;
             }
 
