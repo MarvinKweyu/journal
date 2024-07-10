@@ -46,6 +46,8 @@ You can create an admin user once the app is running with:
 docker-compose exec web python manage.py createsuperuser
 ```
 
+Alternatively, you can log in with the already created account credentials found at the end of this page.
+
 ### Accesing the project locally
 
 Choosing either of the above will let you access the project via the following URLS.
@@ -57,10 +59,12 @@ Admin Panel: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
 **Admin credentials:**
 
-**username**: marvin
+**username**: journaladmin
 
 **email**: admin@journal.com
 
-**password**: =V8@&,Ue">Yxc7e
+**password**: adminpassword
 
 ## Production 
+
+Work in progress

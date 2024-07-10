@@ -30,3 +30,5 @@ RUN chmod +x /app/entrypoint.sh
 COPY . .
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]
+
+CMD ["bash", "-c", "python manage.py migrate && python manage.py createadmin && python manage.py runserver 0.0.0.0:8000"]

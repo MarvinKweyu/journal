@@ -1,13 +1,17 @@
 services:
   web:
     build: .
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py createadmin && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
       - 8000:8000
     env_file:
       - ./.env.dev
+    environment:
+      - ADMIN_USERNAME=journaladmin
+      - ADMIN_EMAIL=admin@journal.com
+      - ADMIN_PASSWORD=adminpassword
     networks:
       - proxynet
     restart: "on-failure"
