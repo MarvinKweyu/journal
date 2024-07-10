@@ -5,7 +5,7 @@
   - [Local Development](#local-development)
     - [Manual setup](#manual-setup)
     - [Docker setup (It just works)](#docker-setup-it-just-works)
-    - [Accesing the project locally](#accesing-the-project-locally)
+    - [Accessing the project locally](#accessing-the-project-locally)
   - [Production](#production)
 
 ## Local Development
@@ -34,11 +34,22 @@ python3 manage.py runserver
 
 Copy the `.env.example` file onto `.env.dev`
 
+
+```bash
+cp .env.example .env.dev
+```
+
 With docker and docker-compose installed, run the following commands to build and run the application.
 
 ```bash
 docker-compose -f local.yml up
 ```
+
+We are good to go!
+
+**Accessing admin dashboard**
+
+*Method 1: Creating an admin user*
 
 You can create an admin user once the app is running with:
 
@@ -46,9 +57,21 @@ You can create an admin user once the app is running with:
 docker-compose exec web python manage.py createsuperuser
 ```
 
-Alternatively, you can log in with the already created account credentials found at the end of this page.
+*Method 2: Accessing the admin user*
 
-### Accesing the project locally
+Alternatively, you can log in with the already created account credentials below:
+
+
+**username**: journaladmin
+
+**email**: admin@journal.com
+
+**password**: adminpassword
+
+
+### Accessing the project locally
+
+---
 
 Choosing either of the above will let you access the project via the following URLS.
 
@@ -56,14 +79,6 @@ Documentation: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/
 
 Admin Panel: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
-
-**Admin credentials:**
-
-**username**: journaladmin
-
-**email**: admin@journal.com
-
-**password**: adminpassword
 
 ## Production 
 
